@@ -1,7 +1,4 @@
-# This file serves as a boilerplate template rather than an end-application script.
-# The final application is likely to delete this file and use `ci.yml` as the entry point.
-
-name: Run entry ci.yml for each vite starter template
+name: Run entry ci.yml
 on:
   workflow_dispatch:
   push:
@@ -41,24 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         renderer-template:
-          - vanilla
-          - vanilla-ts
-          - vue
           - vue-ts
-          - react
-          - react-ts
-          - react-swc
-          - react-swc-ts
-          - preact
-          - preact-ts
-          - lit
-          - lit-ts
-          - svelte
-          - svelte-ts
-          - solid
-          - solid-ts
-#          - qwik
-#          - qwik-ts
 
   dependabot:
     permissions:
