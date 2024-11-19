@@ -1,19 +1,29 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import { onMounted, ref } from 'vue';
 import LandingPage from './components/LandingPage.vue';
+import MainPage from './components/MainPage.vue';
+import { invoke } from '@vite-electron-builder/preload';
+
+const isLoggedIn = ref(false);
+
+onMounted(async () => {
+  const response = await invoke('tennistv:auth:login');
+  console.log(response);
+  isLoggedIn.value = true;
+});
+
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
-  <LandingPage/>
+  <MainPage v-if="isLoggedIn" :items="[
+    {label: 'HOME'},
+    {label: 'LIVE'},
+    {label: 'REPLAYS'},
+    {label: 'HIGHLIGHTS'},
+    {label: 'TOURNAMENTS'},
+    {label: 'STATS'}
+  ]" :isLoggedIn="isLoggedIn"/>
+  <LandingPage v-else :isLoggedIn="isLoggedIn"/>
 </template>
 
 <style scoped>
