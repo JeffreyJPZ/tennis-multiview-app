@@ -5,12 +5,24 @@ import {createWindowManagerModule} from './modules/WindowManager.js';
 import {terminateAppOnLastWindowClose} from './modules/ApplicationTerminatorOnLastWindowClose.js';
 import {hardwareAccelerationMode} from './modules/HardwareAccelerationModule.js';
 import {autoUpdater} from './modules/AutoUpdater.js';
-import {allowInternalOrigins} from './modules/BlockNotAllowdOrigins.js';
+import {allowInternalOrigins} from './modules/BlockNotAllowedOrigins.js';
 import {allowExternalUrls} from './modules/ExternalUrls.js';
+import {createAuthenticationModule} from './modules/AuthenticationModule.js';
 
 
 export async function initApp(initConfig: AppInitConfig) {
   const moduleRunner = createModuleRunner()
+    // Authentication
+    .init(createAuthenticationModule(
+      'https://sso.tennistv.com/auth/realms/TennisTV/protocol/openid-connect/auth?' +
+      'client_id=tennis-tv-web&' +
+      'redirect_uri=https%3A%2F%2Fwww.tennistv.com&' +
+      'response_mode=fragment&' +
+      'response_type=code&' +
+      'scope=openid',
+      'https://www.tennistv.com',
+      new Set(['refresh_token', 'access_token'])
+    ))
     .init(createWindowManagerModule({initConfig, openDevTools: import.meta.env.DEV}))
     .init(disallowMultipleAppInstance())
     .init(terminateAppOnLastWindowClose())
@@ -22,7 +34,14 @@ export async function initApp(initConfig: AppInitConfig) {
 
     // Security
     .init(allowInternalOrigins(
-      new Set(initConfig.renderer instanceof URL ? [initConfig.renderer.origin] : []),
+      new Set(initConfig.renderer instanceof URL
+        ? [
+          initConfig.renderer.origin,
+          'https://sso.tennistv.com',
+          'https://tennistv.com',
+          'https://www.tennistv.com',
+        ] 
+        : []),
     ))
     .init(allowExternalUrls(
       new Set(
