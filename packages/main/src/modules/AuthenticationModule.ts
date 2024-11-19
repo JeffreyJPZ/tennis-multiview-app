@@ -20,7 +20,7 @@ export class AuthenticationModule implements AppModule {
     }
 
     private registerInvokableHandlers() {
-        const login: Channel = 'auth:login';
+        const login: Channel = 'tennistv:auth:login';
         ipcMain.handle(login, () => this.getTokens());
     }
 

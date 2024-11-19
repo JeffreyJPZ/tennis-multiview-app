@@ -2,4 +2,4 @@
  * Exposes channel names used for communication between main and render processes
  */
 
-export type Channel = 'auth:login';
+export type Channel = 'tennistv:auth:login';
