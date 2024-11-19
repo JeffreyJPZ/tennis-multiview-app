@@ -50,7 +50,7 @@ export class AuthenticationModule implements AppModule {
           const webContents = win.webContents;
 
           // Wait for redirect from login page to finish before getting cookies
-          webContents.on('did-navigate', async () => {
+          webContents.on('did-finish-load', async () => {
               const ses = win.webContents.session;
               const cookies = await ses.cookies.get({url: url});
               resolve(cookies);
