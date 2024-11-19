@@ -6,12 +6,12 @@ import {Channel} from '@vite-electron-builder/preload';
 export class AuthenticationModule implements AppModule {
     readonly #authUrl: string;
     readonly #redirectUrl: string;
-    readonly #cookies: Set<string>;
+    readonly #tokens: Set<string>;
 
-    constructor(authUrl: string, redirectUrl: string, cookies: Set<string>) {
+    constructor(authUrl: string, redirectUrl: string, tokens: Set<string>) {
         this.#authUrl = authUrl;
         this.#redirectUrl = redirectUrl;
-        this.#cookies = structuredClone(cookies);
+        this.#tokens = structuredClone(tokens);
     }
   
     async enable({app}: ModuleContext): Promise<void> {
@@ -21,10 +21,10 @@ export class AuthenticationModule implements AppModule {
 
     private registerInvokableHandlers() {
         const login: Channel = 'auth:login';
-        ipcMain.handle(login, () => this.getCookies());
+        ipcMain.handle(login, () => this.getTokens());
     }
 
-    private async getCookies() {
+    private async getTokens() {
         const win = new BrowserWindow({
             width: 800,
             height: 800,
@@ -36,13 +36,13 @@ export class AuthenticationModule implements AppModule {
         const allCookies = await this.getLoggedInCookies(win, this.#redirectUrl);
 
         win.destroy();
-        
-        const cookies = allCookies.filter((cookie) => this.#cookies.has(cookie.name));
 
-        if (cookies.length === this.#cookies.size) {
-            return cookies;
+        const tokens = allCookies.filter((cookie) => this.#tokens.has(cookie.name));
+
+        if (tokens.length === this.#tokens.size) {
+            return tokens;
         }
-        return 'No cookies were found.';
+        return 'No tokens were found.';
     }
 
     private getLoggedInCookies(win: BrowserWindow, url: string): Promise<Electron.Cookie[]> {
